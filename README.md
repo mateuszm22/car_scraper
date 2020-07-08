@@ -12,7 +12,7 @@ mvn clean install
 
 ## Usage
 
-* Install proper [chromedriver](https://chromedriver.chromium.org/downloads) according to the your chrome version.
+* Install proper [chromedriver](https://chromedriver.chromium.org/downloads) according to the your chrome version (put this driver to: src/main/java/utils/).
 * Configure base.url in project.properties
 * Firstly fill the data in page and paste link to .properties file
 * Use xlsx viewer to check the data

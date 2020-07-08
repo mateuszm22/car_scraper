@@ -1,6 +1,5 @@
 package pages;
 
-import converts.ConvertToExcel;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -98,10 +97,5 @@ public class SearchResultsPage {
                 newPage.click();
             }
         }
-    }
-
-    public void saveToExcel() throws Exception { //TODO move to other class
-        ConvertToExcel excelConverts = new ConvertToExcel();
-        excelConverts.saveDataToExcel();
     }
 }
