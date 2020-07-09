@@ -80,7 +80,7 @@ public class SearchResultsPage {
         } else lastPageValue = 0;
     }
 
-    public void scanAllCars() throws InterruptedException {
+    public void scanPageResultsAndAddToList() throws InterruptedException {
         checkLastPageNumber();
         int currentPage = 0;
         for (int i = 0; i <= lastPageValue; i++) {

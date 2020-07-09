@@ -7,7 +7,9 @@ import pages.Car;
 import utils.TimeUtils;
 
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -16,15 +18,19 @@ import java.util.ResourceBundle;
 public class ExcelHelper {
 
     ResourceBundle bundle = ResourceBundle.getBundle("projectprivate");
+    XSSFWorkbook workbook;
+    Sheet sheet;
     private final String xlsFilePath = bundle.getString("xlsxFilePath");
     private static final String[] headerData = {"Name", "Id", "Short Info", "Price", "City", "Link"};
     private static final List<Car> carsData = new ArrayList<>(Car.carsData);
     private static final List<Car> previousScanData = new ArrayList<>();
 
-    public void saveDataToExcel() throws Exception {
-        XSSFWorkbook workbook = new XSSFWorkbook(new FileInputStream(xlsFilePath));
-        Sheet sheet = workbook.createSheet(TimeUtils.getActualTime());
+    public void openXlsFileAndMakeNewSheet() throws IOException {
+        workbook = new XSSFWorkbook(new FileInputStream(xlsFilePath));
+        sheet = workbook.createSheet(TimeUtils.getActualTime());
+    }
 
+    public void prepareHeaderAndStyles() {
         Font headerFont = workbook.createFont();
         headerFont.setBold(true);
         headerFont.setFontHeightInPoints((short) 12);
@@ -32,26 +38,42 @@ public class ExcelHelper {
 
         CellStyle headerCellStyle = workbook.createCellStyle();
         headerCellStyle.setFont(headerFont);
-
-        CellStyle hyperLinkStyle = workbook.createCellStyle();
-        Font hyperLinkFont = workbook.createFont();
-        hyperLinkFont.setUnderline(Font.U_SINGLE);
-        hyperLinkFont.setColor(IndexedColors.BLUE.getIndex());
-        hyperLinkStyle.setFont(hyperLinkFont);
-
         Row headerRow = sheet.createRow(0);
-
         for (int i = 0; i < headerData.length; i++) {
             Cell cell = headerRow.createCell(i);
             cell.setCellValue(headerData[i]);
             cell.setCellStyle(headerCellStyle);
         }
+    }
 
-        // Create Other rows and cells with cars data
+    public CellStyle prepareStyleForHyperLink() {
+        CellStyle hyperLinkStyle = workbook.createCellStyle();
+        Font hyperLinkFont = workbook.createFont();
+        hyperLinkFont.setUnderline(Font.U_SINGLE);
+        hyperLinkFont.setColor(IndexedColors.BLUE.getIndex());
+        hyperLinkStyle.setFont(hyperLinkFont);
+        return hyperLinkStyle;
+    }
+
+    public void resizeColumns() {
+        for (int i = 0; i < headerData.length; i++) {
+            sheet.autoSizeColumn(i);
+        }
+    }
+
+    public void saveAndCloseOutputFile() throws IOException {
+        FileOutputStream fileOut = new FileOutputStream(xlsFilePath);
+        workbook.write(fileOut);
+        fileOut.close();
+        workbook.close();
+    }
+
+    public void saveCarsDataToExcel() throws Exception {
+        openXlsFileAndMakeNewSheet();
+        prepareHeaderAndStyles();
         int rowNum = 1;
         for (Car car : carsData) {
             Row row = sheet.createRow(rowNum++);
-
             row.createCell(0).setCellValue(car.getCarTitle());
             row.createCell(1).setCellValue(car.getCarId());
             row.createCell(2).setCellValue(car.getCarShortInfo());
@@ -59,21 +81,13 @@ public class ExcelHelper {
             row.createCell(4).setCellValue(car.getCarCity());
             Cell cell = row.createCell(5);
             cell.setCellValue(car.getCarLink());
-            cell.setCellStyle(hyperLinkStyle);
+            cell.setCellStyle(prepareStyleForHyperLink());
             Hyperlink href = workbook.getCreationHelper().createHyperlink(HyperlinkType.URL);
             href.setAddress(car.getCarLink());
             cell.setHyperlink(href);
         }
-
-        // Resize all columns to fit the content size
-        for (int i = 0; i < headerData.length; i++) {
-            sheet.autoSizeColumn(i);
-        }
-
-        FileOutputStream fileOut = new FileOutputStream(xlsFilePath);
-        workbook.write(fileOut);
-        fileOut.close();
-        workbook.close();
+        resizeColumns();
+        saveAndCloseOutputFile();
     }
 
 

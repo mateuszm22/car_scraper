@@ -3,4 +3,5 @@ target
 car-scraper.iml
 src/main/java/utils/chromedriver.exe
 src/main/resources/projectprivate.properties
+excels/carsData.xlsx
 

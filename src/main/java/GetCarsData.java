@@ -8,9 +8,9 @@ public class GetCarsData {
         AppConfig.startApplication();
         SearchResultsPage searchResultsPage = new SearchResultsPage(AppConfig.getDriver());
         searchResultsPage.initializeSearchResultsPage();
-        searchResultsPage.scanAllCars();
+        searchResultsPage.scanPageResultsAndAddToList();
         ExcelHelper excelHelper = new ExcelHelper();
-        excelHelper.saveDataToExcel();
+        excelHelper.saveCarsDataToExcel();
         AppConfig.getDriver().quit();
        // SendEmailUtils sendEmailUtils = new SendEmailUtils();
       //  sendEmailUtils.sendEmail();
