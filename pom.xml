@@ -7,6 +7,8 @@
     <groupId>matm</groupId>
     <artifactId>car_scraper</artifactId>
     <version>1.0-SNAPSHOT</version>
+    <name>car_scraper</name>
+    <description>Scrape data from otomoto</description>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -40,6 +42,11 @@
             <groupId>org.awaitility</groupId>
             <artifactId>awaitility</artifactId>
             <version>3.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.mail</groupId>
+            <artifactId>javax.mail</artifactId>
+            <version>1.6.2</version>
         </dependency>
     </dependencies>
 

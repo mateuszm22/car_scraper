@@ -46,21 +46,22 @@ public class SearchResultsPage {
 //    @FindBy(xpath = "//div[contains(@class, 'offers list')]/article")
 //    private WebElement allRows;
 
-
-    String PAGE_NUMBER_XPATH = "//*[@id='body-container']/div[2]/div[2]/ul/li[@class='' or @class='active'][contains(.,'${pageNumber}')]/a";
+    int lastPageValue;
+    String ALL_CARS_ROWS_SELECTOR_XPATH = "//div[contains(@class, 'offers list')]/article";
+    String CAR_TITLE_SELECTOR_CLASS = "offer-item__title";
+    String CAR_ID_SELECTOR_ID = "data-ad-id";
+    String CAR_SHORT_INFO_SELECTOR_CLASS = "ds-params-block";
+    String CAR_PRICE_SELECTOR_CLASS = "ds-price-number";
+    String CAR_CITY_SELECTOR_CLASS = "ds-location";
+    String CAR_LINK_SELECTOR_CLASS = "data-href";
+    String LIST_OF_PAGES_SELECTOR_XPATH = "//*[@id='body-container']/div[2]/div[2]/ul/li[@class='' or @class='active']";
+    String PAGE_NUMBER_SELECTOR_XPATH = "//*[@id='body-container']/div[2]/div[2]/ul/li[@class='' or @class='active'][contains(.,'${pageNumber}')]/a";
 
     @FindBy(xpath = "//*[@id='submit-filters']")
     private WebElement submitFilters;
 
-    @FindBy(className = "icon-arrow_right")
-    private WebElement nextPageArrow;
-
     @FindBy(className = "cookiesBarClose")
     private WebElement closeCookiesBar;
-
-    @FindBy(className = "om-pager rel")
-    private WebElement paginationContainer;
-
 
     public SearchResultsPage(WebDriver driver) {
         PageFactory.initElements(driver, this);
@@ -71,29 +72,37 @@ public class SearchResultsPage {
         closeCookiesBar.click();
     }
 
+    public void checkLastPageNumber() {
+        List<WebElement> listOfPages = driver.findElements(By.xpath(LIST_OF_PAGES_SELECTOR_XPATH));
+        if (listOfPages.size() > 0) {
+            String lastPage = listOfPages.get(listOfPages.size() - 1).getText();
+            lastPageValue = Integer.parseInt(lastPage);
+        } else lastPageValue = 0;
+    }
+
     public void scanAllCars() throws InterruptedException {
-        List<WebElement> listOfPages = driver.findElements(By.xpath("//*[@id='body-container']/div[2]/div[2]/ul/li[@class='' or @class='active']"));
+        checkLastPageNumber();
         int currentPage = 0;
-        for (int i = 0; i <= listOfPages.size(); i++) {
+        for (int i = 0; i <= lastPageValue; i++) {
             currentPage++;
-            TimeUnit.SECONDS.sleep(1); // TODO refactor
-            List<WebElement> listOfRows = driver.findElements(By.xpath("//div[contains(@class, 'offers list')]/article"));
+            TimeUnit.SECONDS.sleep(2); // TODO refactor
+            List<WebElement> listOfCarRows = driver.findElements(By.xpath(ALL_CARS_ROWS_SELECTOR_XPATH));
             String carTitle, carId, carShortInfo, carPrice, carCity, carLink;
-            for (WebElement row : listOfRows) {
-                carTitle = String.valueOf(row.findElement(By.className("offer-item__title")).getText());
-                carId = row.getAttribute("data-ad-id");
-                carShortInfo = String.valueOf(row.findElement(By.className("ds-params-block")).getText());
-                carPrice = String.valueOf(row.findElement(By.className("ds-price-number")).getText());
-                carCity = String.valueOf(row.findElement(By.className("ds-location")).getText());
-                carLink = row.getAttribute("data-href");
+            for (WebElement row : listOfCarRows) {
+                carTitle = String.valueOf(row.findElement(By.className(CAR_TITLE_SELECTOR_CLASS)).getText());
+                carId = row.getAttribute(CAR_ID_SELECTOR_ID);
+                carShortInfo = String.valueOf(row.findElement(By.className(CAR_SHORT_INFO_SELECTOR_CLASS)).getText());
+                carPrice = String.valueOf(row.findElement(By.className(CAR_PRICE_SELECTOR_CLASS)).getText());
+                carCity = String.valueOf(row.findElement(By.className(CAR_CITY_SELECTOR_CLASS)).getText());
+                carLink = row.getAttribute(CAR_LINK_SELECTOR_CLASS);
                 Car.carsData.add(new Car(carTitle, carId, carShortInfo, carPrice, carCity, carLink));
                 System.out.println("Added new car to file:" + '\n' + carTitle);
             }
-            if (currentPage >= listOfPages.size()) {
+            if (currentPage >= lastPageValue) {
                 System.out.println("No more offers");
                 break;
             } else {
-                WebElement newPage = driver.findElement(By.xpath(PAGE_NUMBER_XPATH.replace("${pageNumber}", String.valueOf(currentPage + 1))));
+                WebElement newPage = driver.findElement(By.xpath(PAGE_NUMBER_SELECTOR_XPATH.replace("${pageNumber}", String.valueOf(currentPage + 1))));
                 newPage.click();
             }
         }

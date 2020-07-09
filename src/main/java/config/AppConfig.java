@@ -21,12 +21,12 @@ public class AppConfig {
         System.setProperty("webdriver.chrome.driver", chromeDriverPath);
         ChromeOptions options = new ChromeOptions();
         options.addArguments("load-extension=" + adBlockPath);
-        options.addArguments("--disable-gpu", "--headless", "window-size=1200,1100", "-incognito", "--disable-popup-blocking", "no-sandbox");
+        options.addArguments("--disable-gpu", "--headless", "-incognito", "--disable-popup-blocking", "no-sandbox", "window-size=1200,1100");
         DesiredCapabilities capabilities = new DesiredCapabilities();
         capabilities.setCapability(ChromeOptions.CAPABILITY, options);
         driver = new ChromeDriver(options);
         //closeAdBlockTab();
-        ResourceBundle bundle = ResourceBundle.getBundle("project");
+        ResourceBundle bundle = ResourceBundle.getBundle("projectprivate");
         driver.get(bundle.getString("base.url"));
         driver.manage().window().maximize();
     }

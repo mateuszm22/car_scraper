@@ -7,7 +7,7 @@ public class TimeUtils {
     }
 
     public static String getActualTime(){
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(" " + "yyyy-MM-dd" + " " + "HH-mm-ss");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(" " + "EEEE" + " " + "dd-MM-yyyy" + " " + "HH-mm");
         return LocalDateTime.now().format(formatter);
     }
 }

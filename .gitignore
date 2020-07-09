@@ -2,5 +2,5 @@ target
 .idea
 car-scraper.iml
 src/main/java/utils/chromedriver.exe
-excels/carsData.xlsx
+src/main/resources/projectprivate.properties
 

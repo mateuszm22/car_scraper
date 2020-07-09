@@ -1,5 +1,6 @@
 package excelHelpers;
 
+import org.apache.poi.common.usermodel.HyperlinkType;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import pages.Car;
@@ -9,13 +10,16 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.ResourceBundle;
 
 
-public class ConvertToExcel {
+public class ExcelHelper {
 
-    private static final String xlsFilePath = "excels/carsData.xlsx";
+    ResourceBundle bundle = ResourceBundle.getBundle("projectprivate");
+    private final String xlsFilePath = bundle.getString("xlsxFilePath");
     private static final String[] headerData = {"Name", "Id", "Short Info", "Price", "City", "Link"};
-    private static final List<Car> carsData =  new ArrayList<>(Car.carsData);
+    private static final List<Car> carsData = new ArrayList<>(Car.carsData);
+    private static final List<Car> previousScanData = new ArrayList<>();
 
     public void saveDataToExcel() throws Exception {
         XSSFWorkbook workbook = new XSSFWorkbook(new FileInputStream(xlsFilePath));
@@ -29,9 +33,15 @@ public class ConvertToExcel {
         CellStyle headerCellStyle = workbook.createCellStyle();
         headerCellStyle.setFont(headerFont);
 
+        CellStyle hyperLinkStyle = workbook.createCellStyle();
+        Font hyperLinkFont = workbook.createFont();
+        hyperLinkFont.setUnderline(Font.U_SINGLE);
+        hyperLinkFont.setColor(IndexedColors.BLUE.getIndex());
+        hyperLinkStyle.setFont(hyperLinkFont);
+
         Row headerRow = sheet.createRow(0);
 
-        for(int i = 0; i < headerData.length; i++) {
+        for (int i = 0; i < headerData.length; i++) {
             Cell cell = headerRow.createCell(i);
             cell.setCellValue(headerData[i]);
             cell.setCellStyle(headerCellStyle);
@@ -39,7 +49,7 @@ public class ConvertToExcel {
 
         // Create Other rows and cells with cars data
         int rowNum = 1;
-        for(Car car: carsData) {
+        for (Car car : carsData) {
             Row row = sheet.createRow(rowNum++);
 
             row.createCell(0).setCellValue(car.getCarTitle());
@@ -47,11 +57,16 @@ public class ConvertToExcel {
             row.createCell(2).setCellValue(car.getCarShortInfo());
             row.createCell(3).setCellValue(car.getCarPrice());
             row.createCell(4).setCellValue(car.getCarCity());
-            row.createCell(5).setCellValue(car.getCarLink());
+            Cell cell = row.createCell(5);
+            cell.setCellValue(car.getCarLink());
+            cell.setCellStyle(hyperLinkStyle);
+            Hyperlink href = workbook.getCreationHelper().createHyperlink(HyperlinkType.URL);
+            href.setAddress(car.getCarLink());
+            cell.setHyperlink(href);
         }
 
         // Resize all columns to fit the content size
-        for(int i = 0; i < headerData.length; i++) {
+        for (int i = 0; i < headerData.length; i++) {
             sheet.autoSizeColumn(i);
         }
 
@@ -60,4 +75,8 @@ public class ConvertToExcel {
         fileOut.close();
         workbook.close();
     }
+
+
+//TODO make methods that are compare previous results from excel and if something was in previous run will not add
+
 }
