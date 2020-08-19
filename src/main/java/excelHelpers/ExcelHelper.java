@@ -3,11 +3,10 @@ package excelHelpers;
 import org.apache.poi.common.usermodel.HyperlinkType;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import pages.Car;
+import model.Car;
 import utils.TimeUtils;
 
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -22,11 +21,15 @@ public class ExcelHelper {
     Sheet sheet;
     private final String xlsFilePath = bundle.getString("xlsxFilePath");
     private static final String[] headerData = {"Name", "Id", "Short Info", "Price", "City", "Link"};
-    private static final List<Car> carsData = new ArrayList<>(Car.carsData);
-    private static final List<Car> previousScanData = new ArrayList<>();
+    private static final List<Car> currentCarsData = new ArrayList<>(Car.carsData);
+    private static final List<Car> previousScanCarsData = new ArrayList<>();
 
-    public void openXlsFileAndMakeNewSheet() throws IOException {
+    public void openXlsFile() throws IOException {
         workbook = new XSSFWorkbook(new FileInputStream(xlsFilePath));
+
+    }
+
+    public void createNewSheet(){
         sheet = workbook.createSheet(TimeUtils.getActualTime());
     }
 
@@ -69,10 +72,12 @@ public class ExcelHelper {
     }
 
     public void saveCarsDataToExcel() throws Exception {
-        openXlsFileAndMakeNewSheet();
+        openXlsFile();
+        //getPreviousScanData();
+        createNewSheet();
         prepareHeaderAndStyles();
         int rowNum = 1;
-        for (Car car : carsData) {
+        for (Car car : currentCarsData) {
             Row row = sheet.createRow(rowNum++);
             row.createCell(0).setCellValue(car.getCarTitle());
             row.createCell(1).setCellValue(car.getCarId());
@@ -90,7 +95,5 @@ public class ExcelHelper {
         saveAndCloseOutputFile();
     }
 
-
-//TODO make methods that are compare previous results from excel and if something was in previous run will not add
-
+  
 }
